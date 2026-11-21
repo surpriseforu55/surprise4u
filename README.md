@@ -1,32 +1,27 @@
 # surprise4u website and local backend
 
-## Run the local website
+## Run locally
 
 1. Install Node.js.
-2. Optionally copy `.env.example` to `.env` and add Razorpay **test-mode** Key ID and Key Secret.
-3. In PowerShell, run `npm.cmd start` from this project folder. (`npm start` also works in shells that allow npm scripts.)
+2. Optionally copy `.env.example` to `.env` and add Razorpay test-mode keys.
+3. In PowerShell run `npm.cmd start` from this folder.
 4. Open http://127.0.0.1:3000.
 
-The server intentionally listens only on `127.0.0.1` for local development. The site is not public and its address cannot be submitted as a live website URL.
+## Preview deployment
 
-## Site pages
+`render.yaml` defines a free Render web service for preview. Add the latest project files to the public GitHub repository, then create a Blueprint in Render from that repository. Render supplies a temporary `onrender.com` URL. The preview service binds to Render's network interface only when Render sets `HOST=0.0.0.0`; local runs remain bound to 127.0.0.1.
 
-- `/index.html` — storefront, gift catalog, cart, gift order form, event enquiry.
-- `/terms.html`, `/privacy.html`, `/refunds.html`, `/shipping.html`, `/contact.html` — policy and contact drafts.
+The free preview has an ephemeral filesystem. Orders saved to local JSON Lines files can disappear after a restart or deploy, so do not use it to collect real customer information or fulfill real orders. Razorpay credentials are intentionally not included in the Blueprint. Do not configure live keys in this preview.
 
-The policy drafts contain `[ADD ... BEFORE LAUNCH]` placeholders. Replace them with the real business contact details, service area, delivery terms, cancellation cut-off, refund timeline and claims process before publishing or submitting the site for merchant review.
+## Website pages
 
-## Payment integration
+- `/index.html` — gift catalog, cart, gift details, event inquiry.
+- `/terms.html`, `/privacy.html`, `/refunds.html`, `/shipping.html`, `/contact.html` — policy drafts.
 
-- `GET /api/products` returns the server catalog.
-- `POST /api/orders` creates a gift order or event enquiry. The server calculates catalog prices; it does not trust browser totals.
-- `POST /api/payments/create-order` creates the Razorpay order on the server.
-- Razorpay Standard Checkout shows payment methods enabled for the merchant account, such as UPI and cards.
-- `POST /api/payments/verify` validates the checkout signature and confirms the payment against Razorpay's API.
-- `GET /api/payment-config` reports whether the local server has gateway keys configured.
+These pages still contain `[ADD ... BEFORE LAUNCH]` placeholders. Replace them with accurate business contacts, service areas, delivery terms, refund/cancellation timelines and claims process before asking Razorpay to review the site.
 
-Copy `.env.example` to `.env` to configure local **test** keys. Never put `RAZORPAY_KEY_SECRET` in HTML, browser JavaScript, or source control. Test mode does not move real money; Live mode uses separate keys and requires account activation and website review.
+## Payment flow
 
-## Work still required before launch
+The Node backend calculates catalog prices and includes Razorpay order creation and signature/status verification. Razorpay Standard Checkout displays payment methods enabled for the merchant account, such as UPI and cards. Test and live keys are separate; the Key Secret must stay in server environment variables and never go in browser code or source control.
 
-The legal/contact pages need the real details described above. The current server is local-only and stores order data in local JSON Lines files; those files may contain addresses and phone numbers. This prototype must not be exposed publicly. A production launch still needs a production hosting setup, database with access controls and backups, HTTPS, admin authentication, rate limiting, webhook/reconciliation handling, retention/deletion rules, and the merchant's approved live keys. Confirm payment is captured before fulfilling an order.
+The free preview is not a production payment service. Before real payments, connect a durable database with access controls and backups, configure production hosting and HTTPS, complete security/privacy and webhook handling, and use the merchant account's approved live keys. Fulfil orders only after server-side payment status verification confirms capture.

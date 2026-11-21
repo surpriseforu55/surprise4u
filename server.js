@@ -17,7 +17,7 @@ async function loadLocalEnv() {
   }
 }
 
-const HOST = '127.0.0.1';
+const HOST = process.env.HOST || '127.0.0.1';
 const PORT = Number(process.env.PORT || 3000);
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, 'data');
@@ -144,6 +144,7 @@ async function handle(request, response) {
   }
 
   if (request.method === 'POST' && url.pathname === '/api/orders') {
+    if (process.env.PREVIEW_MODE === 'true') return sendJson(response, 503, { error: 'Preview site only. Orders are disabled until production storage and support details are configured.' });
     let order;
     try { order = normalizeOrder(await readJson(request)); }
     catch (error) { return sendJson(response, 400, { error: error.message }); }
@@ -152,6 +153,7 @@ async function handle(request, response) {
   }
 
   if (request.method === 'POST' && url.pathname === '/api/payments/create-order') {
+    if (process.env.PREVIEW_MODE === 'true') return sendJson(response, 503, { error: 'Payment checkout is disabled on the preview site.' });
     if (!gatewayReady()) return sendJson(response, 503, { error: 'Razorpay is not configured. Add test API keys to the local .env file and restart the server.' });
     let body;
     try { body = await readJson(request); }
@@ -171,6 +173,7 @@ async function handle(request, response) {
   }
 
   if (request.method === 'POST' && url.pathname === '/api/payments/verify') {
+    if (process.env.PREVIEW_MODE === 'true') return sendJson(response, 503, { error: 'Payment verification is disabled on the preview site.' });
     if (!gatewayReady()) return sendJson(response, 503, { error: 'Razorpay is not configured.' });
     let body;
     try { body = await readJson(request); }

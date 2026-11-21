@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: surprise4u-preview
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: PREVIEW_MODE
+        value: "true"
