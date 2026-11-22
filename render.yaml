@@ -3,7 +3,7 @@ services:
     name: surprise4u-preview
     runtime: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
@@ -11,3 +11,7 @@ services:
         value: 0.0.0.0
       - key: PREVIEW_MODE
         value: "true"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-6.2-astra

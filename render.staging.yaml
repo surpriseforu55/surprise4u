@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: surprise4u-staging
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: NODE_ENV
+        value: staging
+      - key: PREVIEW_MODE
+        value: "false"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: surprise4u-staging-db
+          property: connectionString
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-6.2-astra
+
+
+databases:
+  - name: surprise4u-staging-db
+    databaseName: surprise4u_staging
+    user: surprise4u
+    plan: free
+    region: singapore
+    ipAllowList: []
